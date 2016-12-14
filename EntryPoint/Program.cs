@@ -92,27 +92,30 @@ namespace EntryPoint
             return specialBuildings;
         }
 
-            // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
+        // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
             Console.WriteLine("Building coordinate: " + specialBuildings + " Distance: " + housesAndDistances);
 
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
             Console.WriteLine("Aantal specialbuildings: " + specialBuildings.Count());
-
-            for (int i = 0; i < specialBuildings.Count(); i++)
-            {
-                Console.WriteLine("Building coordinate: " + specialBuildingsList[i]);
-
-            }
-
             List<Vector2> coordinates = housesAndDistances.Select(t => t.Item1).ToList();
             List<float> distances = housesAndDistances.Select(t => t.Item2).ToList();
 
             for (int i = 0; i < housesAndDistances.Count(); i++)
             {
-                Console.WriteLine("Building coordinate: " + distances[i] + " House no.: " + i + " With the coordinates " + coordinates[i]);
+                Console.WriteLine(" House no.: " + i + "   with the coordinates " + coordinates[i] + "   has a distance of: " + distances[i]);
+            }
 
+            for (int i = 0; i < specialBuildings.Count(); i++)
+            {
+                for (int j = 0; j < coordinates.Count(); j++)
+                {
+                    if ((Vector2.Distance(specialBuildingsList[i], coordinates[j])) < distances[j])
+                    {
+                        Console.WriteLine("Special Building: " + specialBuildingsList[i] + "   with distance of: " + Vector2.Distance(specialBuildingsList[i], coordinates[j]) + "   from house " + coordinates[j] + " geeft    "+ distances[j]);
+                    }
+                }    
             }
 
             return
