@@ -95,28 +95,37 @@ namespace EntryPoint
         // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
-            Console.WriteLine("Building coordinate: " + specialBuildings + " Distance: " + housesAndDistances);
-
+            //Console.WriteLine("Building coordinate: " + specialBuildings + " Distance: " + housesAndDistances);
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
-            Console.WriteLine("Aantal specialbuildings: " + specialBuildings.Count());
-            List<Vector2> coordinates = housesAndDistances.Select(t => t.Item1).ToList();
-            List<float> distances = housesAndDistances.Select(t => t.Item2).ToList();
-
-            for (int i = 0; i < housesAndDistances.Count(); i++)
-            {
-                Console.WriteLine(" House no.: " + i + "   with the coordinates " + coordinates[i] + "   has a distance of: " + distances[i]);
-            }
 
             for (int i = 0; i < specialBuildings.Count(); i++)
             {
-                for (int j = 0; j < coordinates.Count(); j++)
-                {
-                    if ((Vector2.Distance(specialBuildingsList[i], coordinates[j])) < distances[j])
-                    {
-                        Console.WriteLine("Special Building: " + specialBuildingsList[i] + "   with distance of: " + Vector2.Distance(specialBuildingsList[i], coordinates[j]) + "   from house " + coordinates[j] + " geeft    "+ distances[j]);
-                    }
-                }    
+                Console.WriteLine("Special Building: " + specialBuildingsList[i]);
             }
+        
+
+                // Console.WriteLine("Aantal specialbuildings: " + specialBuildings.Count());
+                //List<Vector2> coordinates = housesAndDistances.Select(t => t.Item1).ToList();
+                //List<float> distances = housesAndDistances.Select(t => t.Item2).ToList();
+
+                //for (int i = 0; i < housesAndDistances.Count(); i++)
+                //{
+                // Console.WriteLine(" House no.: " + i + "   with the coordinates " + coordinates[i] + "   has a distance of: " + distances[i]);
+                //}
+
+            //    for (int i = 0; i < specialBuildings.Count(); i++)
+            //{
+            //    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
+
+            //    for (int j = 0; j < coordinates.Count(); j++)
+            //    {
+            //        if ((Vector2.Distance(specialBuildingsList[i], coordinates[j])) < distances[j])
+            //        {
+            //            //Console.WriteLine("Special Building: " + specialBuildingsList[i] + "   with distance of: " + Vector2.Distance(specialBuildingsList[i], coordinates[j]) + "   from house " + coordinates[j] + " geeft    " + distances[j]);
+            //        }
+            //    }
+            //}
+            
 
             return
                 from h in housesAndDistances
@@ -125,9 +134,10 @@ namespace EntryPoint
                   where Vector2.Distance(h.Item1, s) <= h.Item2
                   select s;
 
-        }
+            }
 
-        private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
+
+    private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
           Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
         {
             var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
@@ -138,6 +148,7 @@ namespace EntryPoint
                 prevRoad = (roads.Where(x => x.Item1.Equals(prevRoad.Item2)).OrderBy(x => Vector2.Distance(x.Item2, destinationBuilding)).First());
                 fakeBestPath.Add(prevRoad);
             }
+            Console.WriteLine(fakeBestPath);
             return fakeBestPath;
         }
 
