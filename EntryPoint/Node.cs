@@ -15,6 +15,7 @@ namespace EntryPoint
         public KDTree<T> Right { get; set; }
         public T Value { get; set; }
 
+
         public Node(KDTree<T> left, KDTree<T> right, T value, bool vertical)
         {
             Left = left;
@@ -22,6 +23,11 @@ namespace EntryPoint
             Value = value;
             IsVertical = vertical;
         }
+
+        public Node()
+        {
+        }
+
 
         //j huidige value, en k de nieuwe in te vullen value.
         public KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
@@ -58,8 +64,9 @@ namespace EntryPoint
                         return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, true);
                     }
                 }
+                
             }
         }
-           
+       
     }
 }

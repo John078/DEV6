@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using EntryPoint;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,13 @@ namespace EntryPoint
 #if WINDOWS || LINUX
     public static class Program
     {
+        private static KDTree<Vector2> j;
+        private static bool IsVertical;
 
         [STAThread]
         static void Main()
         {
+            
 
             var fullscreen = false;
             read_input:
@@ -92,52 +96,117 @@ namespace EntryPoint
             return specialBuildings;
         }
 
+
+
+        //----------------------------------   Assignment 2 ---------------------------------//
+
+
         // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
-            //Console.WriteLine("Building coordinate: " + specialBuildings + " Distance: " + housesAndDistances);
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
+            List<List<Vector2>> final_result = new List<List<Vector2>>();
+            List<Vector2> result = new List<Vector2>();
 
-            for (int i = 0; i < specialBuildings.Count(); i++)
+
+            foreach (Tuple<Vector2, float> h in housesAndDistances)
             {
-                Console.WriteLine("Special Building: " + specialBuildingsList[i]);
-            }
-        
+                for (int i = 0; i < specialBuildings.Count(); i++)
+                {
+                    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
+                    Search(specialBuildingsList[i], h.Item1, h.Item2, result);
 
-                // Console.WriteLine("Aantal specialbuildings: " + specialBuildings.Count());
-                //List<Vector2> coordinates = housesAndDistances.Select(t => t.Item1).ToList();
-                //List<float> distances = housesAndDistances.Select(t => t.Item2).ToList();
-
-                //for (int i = 0; i < housesAndDistances.Count(); i++)
-                //{
-                // Console.WriteLine(" House no.: " + i + "   with the coordinates " + coordinates[i] + "   has a distance of: " + distances[i]);
-                //}
-
-            //    for (int i = 0; i < specialBuildings.Count(); i++)
-            //{
-            //    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
-
-            //    for (int j = 0; j < coordinates.Count(); j++)
-            //    {
-            //        if ((Vector2.Distance(specialBuildingsList[i], coordinates[j])) < distances[j])
-            //        {
-            //            //Console.WriteLine("Special Building: " + specialBuildingsList[i] + "   with distance of: " + Vector2.Distance(specialBuildingsList[i], coordinates[j]) + "   from house " + coordinates[j] + " geeft    " + distances[j]);
-            //        }
-            //    }
-            //}
-            
-
-            return
-                from h in housesAndDistances
-                select
-                  from s in specialBuildings
-                  where Vector2.Distance(h.Item1, s) <= h.Item2
-                  select s;
+                }
+                Console.WriteLine(h);
+                Console.WriteLine(h.Item1);
+                
+                final_result.Add(result);
 
             }
+            Console.WriteLine("hallo");
+            return final_result;
+
+            //return
+            //    from h in housesAndDistances
+            //    select
+            //      from s in specialBuildings
+            //      where Vector2.Distance(h.Item1, s) <= h.Item2
+            //      select s;
+            }
+
+        static void Search(KDTree<Vector2> j, Vector2 house, float distance, List<Vector2> result)
+        {
+            if (j.IsEmpty)
+            {
+                Console.WriteLine("Empty");
+            }
+            else
+            {
+                Console.WriteLine("Huidige value" + j + "Nieuwe value:" + house);
+                if (j.Value == house)
+                {
+                    Console.WriteLine("OK");
+                }
+                else
+                {
+                    if (IsVertical) //X-as
+                    {
+                        if (Math.Abs(j.Value.X - house.X) <= distance)
+                        {
+                            if (Vector2.Distance(j.Value, house) <= distance)
+                            {
+                                result.Add(j.Value);
+                                Search(j.Left, house, distance, result);
+                                Search(j.Right, house, distance, result);
+                            }
+                        }
+                        else if (j.Value.X > (house.X + distance))
+                        {
+                            Search(j.Left, house, distance, result);
+                        }
+                        else if (j.Value.X < (house.X - distance))
+                        {
+                            Search(j.Right, house, distance, result);
+                        }
+
+                    }
+                    else //Y-as
+                    {
+                        if (Math.Abs(j.Value.Y - house.Y) <= distance)
+                        {
+                            if (Vector2.Distance(j.Value, house) <= distance)
+                            {
+                                result.Add(j.Value);
+                                Search(j.Left, house, distance, result);
+                                Search(j.Right, house, distance, result);
+                            }
+                        }
+                        else if (j.Value.Y > (house.Y + distance))
+                        {
+                            Search(j.Left, house, distance, result);
+                        }
+                        else if (j.Value.Y < (house.Y - distance))
+                        {
+                            Search(j.Right, house, distance, result);
+                        }
+                    }
+                }
+            }
+        }
+
+        static void PrintpreOder<T>(KDTree<T> j)
+        {
+            Console.WriteLine(j.Value);
+            PrintpreOder(j.Left);
+            PrintpreOder(j.Right);
+        }
 
 
-    private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
+
+
+        //----------------------------------   Assignment 3 ---------------------------------//
+
+        private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
           Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
         {
             var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
@@ -223,5 +292,9 @@ namespace EntryPoint
 
 
 #endif
+    }
+
+    internal class T
+    {
     }
 }
