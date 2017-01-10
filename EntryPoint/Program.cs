@@ -1,6 +1,7 @@
 ﻿using EntryPoint;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,6 @@ namespace EntryPoint
 #if WINDOWS || LINUX
     public static class Program
     {
-        private static KDTree<Vector2> j;
         private static bool IsVertical;
 
         [STAThread]
@@ -104,10 +104,12 @@ namespace EntryPoint
         // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
+            //List<Vector2> specialBuildingsList = specialBuildings.ToList();
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
+
             List<List<Vector2>> final_result = new List<List<Vector2>>();
             List<Vector2> result = new List<Vector2>();
-
+            
 
             foreach (Tuple<Vector2, float> h in housesAndDistances)
             {
