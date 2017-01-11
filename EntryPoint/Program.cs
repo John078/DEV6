@@ -10,9 +10,6 @@ namespace EntryPoint
 #if WINDOWS || LINUX
     public static class Program
     {
-        private static bool IsVertical;
-        private static KDTree<Vector2> j;
-
         [STAThread]
         static void Main()
         {
@@ -100,6 +97,67 @@ namespace EntryPoint
 
         //----------------------------------   Assignment 2 ---------------------------------//
 
+
+        //j huidige value, en k de nieuwe in te vullen value.
+        static KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
+        {
+            if (j.IsVertical)
+            {
+                //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt false.
+                if (j.Value.X > k.X)
+                {
+                    if (j.Left.IsEmpty)
+                    {
+                        j.Left = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, false);
+                    }
+                    else
+                    {
+                        j.Left = Insert(j.Left, k);
+                    }
+                }
+                else
+                {
+                    if (j.Right.IsEmpty)
+                    {
+                        j.Right = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, false);
+                    }
+                    else
+                    {
+                        j.Right = Insert(j.Right, k);
+                    }
+                }
+            }
+            else
+            {
+                //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt true.
+                if (j.Value.Y > k.Y)
+                { 
+                    if (j.Left.IsEmpty)
+                    {
+                        j.Left = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
+                    }
+                    else
+                    {
+                        j.Left = Insert(j.Left, k);
+                    }
+                }
+                else
+                {
+                    if (j.Right.IsEmpty)
+                    {
+                        j.Right = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
+                    }
+                    else
+                    {
+                        j.Right = Insert(j.Right, k);
+                    }
+                }
+            }
+            return j;            
+        }
+
+
+
         static void Search(KDTree<Vector2> j, Vector2 house, float distance, List<Vector2> result)
         {
             if (j.IsEmpty)
@@ -115,16 +173,16 @@ namespace EntryPoint
                 }
                 else
                 {
-                    if (IsVertical) //X-as
+                    if (j.IsVertical) //X-as
                     {
                         if (Math.Abs(j.Value.X - house.X) <= distance)
                         {
                             if (Vector2.Distance(j.Value, house) <= distance)
                             {
                                 result.Add(j.Value);
-                                Search(j.Left, house, distance, result);
-                                Search(j.Right, house, distance, result);
                             }
+                            Search(j.Left, house, distance, result);
+                            Search(j.Right, house, distance, result);
                         }
                         else if (j.Value.X > (house.X + distance))
                         {
@@ -162,66 +220,39 @@ namespace EntryPoint
         }
 
 
-        //j huidige value, en k de nieuwe in te vullen value.
-        static KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
-        {
-            if (j.IsEmpty)
-            {
-                return new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
-            }
-
-            //if not empty
-            else
-            {
-                if (IsVertical)
-                {
-                    //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt false.
-                    if (j.Value.X > k.X)
-                    {
-                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, false);
-                    }
-                    else
-                    {
-                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, false);
-                    }
-                }
-                else
-                {
-                    //als de nieuwe value kleinder is dan j gaat hij naar links. Vertical wordt true.
-                    if (j.Value.Y > k.Y)
-                    {
-                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, true);
-                    }
-                    else
-                    {
-                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, true);
-                    }
-                }
-
-            }
-        }
-
         // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
             //List<Vector2> specialBuildingsList = specialBuildings.ToList();
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
             List<List<Vector2>> final_result = new List<List<Vector2>>();
-            List<Vector2> result = new List<Vector2>();
-
+            
+            KDTree<Vector2> j = null;
+            for (int i = 0; i < specialBuildings.Count(); i++)
+            {
+                if (j == null)
+                {
+                    j = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), specialBuildingsList[i], true);
+                }
+                else
+                {
+                    Console.WriteLine("OK");
+                    j = Insert(j, specialBuildingsList[i]);
+                    Console.WriteLine(Insert(j, specialBuildingsList[i]));
+                }
+            }
 
             foreach (Tuple<Vector2, float> h in housesAndDistances)
             {
                 for (int i = 0; i < specialBuildings.Count(); i++)
                 {
                     Console.WriteLine("Special Building: " + specialBuildingsList[i]);
-
-                    //Insert(specialBuildingsList[i], 0);
+                    
                 }
 
                 Console.WriteLine(h);
                 Console.WriteLine(h.Item1);
-
+                List<Vector2> result = new List<Vector2>();
                 Search(j, h.Item1, h.Item2, result);
                 final_result.Add(result);
 
@@ -287,11 +318,6 @@ namespace EntryPoint
             }
 
             Dijkstra(graph, 0, 9);
-            Console.WriteLine(startingBuilding);
-            Console.WriteLine(StartX);
-            Console.WriteLine(destinationBuilding);
-            Console.WriteLine(allroads[2].Item1);
-            Console.WriteLine(prevRoad);
 
             return fakeBestPath;
         }
@@ -321,46 +347,6 @@ namespace EntryPoint
                 Console.WriteLine("{0}\t  {1}", i, distance[i]);
             }
         }
-
-
-        //public static void Dijkstra(Vector2 A, int B, List<Tuple<Vector2, Vector2>> Road)
-        //{
-        //    int n = Road.Count();
-        //    Vector2[] distance = new Vector2[n];
-        //    bool[] visited = new bool[n];
-        //    //int x = Convert.ToInt32(A.X);
-
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        distance[i] = int.MaxValue;
-        //        visited[i] = false;
-        //    }
-        //    distance[A] = 0;
-
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        int cur = -1;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            if (visited[j]) continue;
-        //            if (cur == -1 || distance[j] < distance[cur])
-        //            {
-        //                cur = j;
-        //            }
-        //        }
-
-        //        visited[cur] = true;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            int path = distance[cur] + A;
-        //            if (path < distance[j])
-        //            {
-        //                distance[j] = path;
-        //            }
-        //        }
-        //    }
-        //    Print(distance, n);
-        //}
 
         public static void Dijkstra(int[,] graph, int source, int count)
         {

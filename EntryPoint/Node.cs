@@ -23,13 +23,6 @@ namespace EntryPoint
             Value = value;
             IsVertical = vertical;
         }
-
-        public Node()
-        {
-        }
-
-
-       
-       
+  
     }
 }
