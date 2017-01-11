@@ -98,20 +98,23 @@ namespace EntryPoint
         //----------------------------------   Assignment 2 ---------------------------------//
 
 
-        //j huidige value, en k de nieuwe in te vullen value.
+        //j is current value and k is the new to inserting value
         static KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
         {
             if (j.IsVertical)
             {
-                //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt false.
+                //if the new value k is smaller then j he moves left. Vertical becomes false.
                 if (j.Value.X > k.X)
                 {
                     if (j.Left.IsEmpty)
                     {
+                        //For the left branch of the tree
+                        //Make a new node when its empty. Left branch and right branch Empty with the new value k and Vertical becomes false.
                         j.Left = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, false);
                     }
                     else
                     {
+                        //Not empty so grab the node that is left and Insert it with the new value
                         j.Left = Insert(j.Left, k);
                     }
                 }
@@ -119,10 +122,13 @@ namespace EntryPoint
                 {
                     if (j.Right.IsEmpty)
                     {
+                        //For the Right branch of the tree
+                        //Make a new node when its empty. Left branch and right branch Empty with the new value k and Vertical becomes false.
                         j.Right = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, false);
                     }
                     else
                     {
+                        //Not empty so grab the node that is right and Insert it with the new value.
                         j.Right = Insert(j.Right, k);
                     }
                 }
@@ -134,10 +140,13 @@ namespace EntryPoint
                 { 
                     if (j.Left.IsEmpty)
                     {
+                        //For the left branch of the tree
+                        //Make a new node when its empty. Left branch and right branch Empty with the new value k and Vertical becomes false.
                         j.Left = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
                     }
                     else
                     {
+                        //Not empty so grab the node that is left and Insert it with the new value
                         j.Left = Insert(j.Left, k);
                     }
                 }
@@ -145,18 +154,19 @@ namespace EntryPoint
                 {
                     if (j.Right.IsEmpty)
                     {
+                        //For the Right branch of the tree
+                        //Make a new node when its empty. Left branch and right branch Empty with the new value k and Vertical becomes false.
                         j.Right = new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
                     }
                     else
                     {
+                        //Not empty so grab the node that is right and Insert it with the new value
                         j.Right = Insert(j.Right, k);
                     }
                 }
             }
             return j;            
         }
-
-
 
         static void Search(KDTree<Vector2> j, Vector2 house, float distance, List<Vector2> result)
         {
@@ -166,7 +176,6 @@ namespace EntryPoint
             }
             else
             {
-                Console.WriteLine("Huidige value" + j + "Nieuwe value:" + house);
                 if (j.Value == house)
                 {
                     Console.WriteLine("OK");
@@ -223,7 +232,6 @@ namespace EntryPoint
         // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
         private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
         {
-            //List<Vector2> specialBuildingsList = specialBuildings.ToList();
             List<Vector2> specialBuildingsList = specialBuildings.ToList();
             List<List<Vector2>> final_result = new List<List<Vector2>>();
             
@@ -236,9 +244,7 @@ namespace EntryPoint
                 }
                 else
                 {
-                    Console.WriteLine("OK");
                     j = Insert(j, specialBuildingsList[i]);
-                    Console.WriteLine(Insert(j, specialBuildingsList[i]));
                 }
             }
 
@@ -246,40 +252,23 @@ namespace EntryPoint
             {
                 for (int i = 0; i < specialBuildings.Count(); i++)
                 {
-                    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
-                    
+                    Console.WriteLine("Special Building: " + specialBuildingsList[i]);                    
                 }
 
-                Console.WriteLine(h);
-                Console.WriteLine(h.Item1);
                 List<Vector2> result = new List<Vector2>();
                 Search(j, h.Item1, h.Item2, result);
                 final_result.Add(result);
-
             }
-            Console.WriteLine("hallo");
             return final_result;
-
-            //return
-            //    from h in housesAndDistances
-            //    select
-            //      from s in specialBuildings
-            //      where Vector2.Distance(h.Item1, s) <= h.Item2
-            //      select s;
-        }
-
-
-        static void PrintpreOder<T>(KDTree<T> j)
-        {
-            Console.WriteLine(j.Value);
-            PrintpreOder(j.Left);
-            PrintpreOder(j.Right);
         }
 
 
 
 
         //----------------------------------   Assignment 3 ---------------------------------//
+
+
+
 
         private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
           Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
@@ -318,6 +307,11 @@ namespace EntryPoint
             }
 
             Dijkstra(graph, 0, 9);
+            Console.WriteLine(startingBuilding);
+            Console.WriteLine(StartX);
+            Console.WriteLine(destinationBuilding);
+            Console.WriteLine(allroads[2].Item1);
+            Console.WriteLine(prevRoad);
 
             return fakeBestPath;
         }
@@ -347,6 +341,46 @@ namespace EntryPoint
                 Console.WriteLine("{0}\t  {1}", i, distance[i]);
             }
         }
+
+
+        //public static void Dijkstra(Vector2 A, int B, List<Tuple<Vector2, Vector2>> Road)
+        //{
+        //    int n = Road.Count();
+        //    Vector2[] distance = new Vector2[n];
+        //    bool[] visited = new bool[n];
+        //    //int x = Convert.ToInt32(A.X);
+
+        //    for (int i = 0; i < n; i++)
+        //    {
+        //        distance[i] = int.MaxValue;
+        //        visited[i] = false;
+        //    }
+        //    distance[A] = 0;
+
+        //    for (int i = 0; i < n; i++)
+        //    {
+        //        int cur = -1;
+        //        for (int j = 0; j < n; j++)
+        //        {
+        //            if (visited[j]) continue;
+        //            if (cur == -1 || distance[j] < distance[cur])
+        //            {
+        //                cur = j;
+        //            }
+        //        }
+
+        //        visited[cur] = true;
+        //        for (int j = 0; j < n; j++)
+        //        {
+        //            int path = distance[cur] + A;
+        //            if (path < distance[j])
+        //            {
+        //                distance[j] = path;
+        //            }
+        //        }
+        //    }
+        //    Print(distance, n);
+        //}
 
         public static void Dijkstra(int[,] graph, int source, int count)
         {
