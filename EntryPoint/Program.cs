@@ -11,11 +11,11 @@ namespace EntryPoint
     public static class Program
     {
         private static bool IsVertical;
+        private static KDTree<Vector2> j;
 
         [STAThread]
         static void Main()
         {
-            
 
             var fullscreen = false;
             read_input:
@@ -100,42 +100,6 @@ namespace EntryPoint
 
         //----------------------------------   Assignment 2 ---------------------------------//
 
-
-        // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
-        private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
-        {
-            //List<Vector2> specialBuildingsList = specialBuildings.ToList();
-            List<Vector2> specialBuildingsList = specialBuildings.ToList();
-
-            List<List<Vector2>> final_result = new List<List<Vector2>>();
-            List<Vector2> result = new List<Vector2>();
-            
-
-            foreach (Tuple<Vector2, float> h in housesAndDistances)
-            {
-                for (int i = 0; i < specialBuildings.Count(); i++)
-                {
-                    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
-                    Search(specialBuildingsList[i], h.Item1, h.Item2, result);
-
-                }
-                Console.WriteLine(h);
-                Console.WriteLine(h.Item1);
-                
-                final_result.Add(result);
-
-            }
-            Console.WriteLine("hallo");
-            return final_result;
-
-            //return
-            //    from h in housesAndDistances
-            //    select
-            //      from s in specialBuildings
-            //      where Vector2.Distance(h.Item1, s) <= h.Item2
-            //      select s;
-            }
-
         static void Search(KDTree<Vector2> j, Vector2 house, float distance, List<Vector2> result)
         {
             if (j.IsEmpty)
@@ -179,9 +143,10 @@ namespace EntryPoint
                             if (Vector2.Distance(j.Value, house) <= distance)
                             {
                                 result.Add(j.Value);
-                                Search(j.Left, house, distance, result);
-                                Search(j.Right, house, distance, result);
                             }
+
+                            Search(j.Left, house, distance, result);
+                            Search(j.Right, house, distance, result);
                         }
                         else if (j.Value.Y > (house.Y + distance))
                         {
@@ -195,6 +160,83 @@ namespace EntryPoint
                 }
             }
         }
+
+
+        //j huidige value, en k de nieuwe in te vullen value.
+        static KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
+        {
+            if (j.IsEmpty)
+            {
+                return new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
+            }
+
+            //if not empty
+            else
+            {
+                if (IsVertical)
+                {
+                    //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt false.
+                    if (j.Value.X > k.X)
+                    {
+                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, false);
+                    }
+                    else
+                    {
+                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, false);
+                    }
+                }
+                else
+                {
+                    //als de nieuwe value kleinder is dan j gaat hij naar links. Vertical wordt true.
+                    if (j.Value.Y > k.Y)
+                    {
+                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, true);
+                    }
+                    else
+                    {
+                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, true);
+                    }
+                }
+
+            }
+        }
+
+        // List with specialbuildings and the radius(housesAndDistance from the specialbuilding.
+        private static IEnumerable<IEnumerable<Vector2>> FindSpecialBuildingsWithinDistanceFromHouse(IEnumerable<Vector2> specialBuildings, IEnumerable<Tuple<Vector2, float>> housesAndDistances)
+        {
+            //List<Vector2> specialBuildingsList = specialBuildings.ToList();
+            List<Vector2> specialBuildingsList = specialBuildings.ToList();
+            List<List<Vector2>> final_result = new List<List<Vector2>>();
+            List<Vector2> result = new List<Vector2>();
+
+
+            foreach (Tuple<Vector2, float> h in housesAndDistances)
+            {
+                for (int i = 0; i < specialBuildings.Count(); i++)
+                {
+                    Console.WriteLine("Special Building: " + specialBuildingsList[i]);
+
+                    //Insert(specialBuildingsList[i], 0);
+                }
+
+                Console.WriteLine(h);
+                Console.WriteLine(h.Item1);
+
+                Search(j, h.Item1, h.Item2, result);
+                final_result.Add(result);
+
+            }
+            Console.WriteLine("hallo");
+            return final_result;
+
+            //return
+            //    from h in housesAndDistances
+            //    select
+            //      from s in specialBuildings
+            //      where Vector2.Distance(h.Item1, s) <= h.Item2
+            //      select s;
+        }
+
 
         static void PrintpreOder<T>(KDTree<T> j)
         {
@@ -211,17 +253,151 @@ namespace EntryPoint
         private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
           Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
         {
+            int[,] graph = {
+    { 0, 4, 0, 0, 0, 0, 0, 8, 0 },
+    { 4, 0, 8, 0, 0, 0, 0, 11, 0 },
+    { 0, 8, 0, 7, 0, 4, 0, 0, 2 },
+    { 0, 0, 7, 0, 9, 14, 0, 0, 0 },
+    { 0, 0, 0, 9, 0, 10, 0, 0, 0 },
+    { 0, 0, 4, 0, 10, 0, 2, 0, 0 },
+    { 0, 0, 0, 14, 0, 2, 0, 1, 6 },
+    { 8, 11, 0, 0, 0, 0, 1, 0, 7 },
+    { 0, 0, 2, 0, 0, 0, 6, 7, 0 }
+};
+
             var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
             List<Tuple<Vector2, Vector2>> fakeBestPath = new List<Tuple<Vector2, Vector2>>() { startingRoad };
+            List<Tuple<Vector2, Vector2>> allroads = roads.ToList(); 
+            List<Tuple<Vector2, Vector2>> neeew = allroads;
+           
             var prevRoad = startingRoad;
+
+            var StartX = startingBuilding.X;
+            var StartY = startingBuilding.Y;
+
+            //int beginX = int(BeginStartRoad.X);
+            //int beginY = BeginStartRoad.Y;
+
+            
             for (int i = 0; i < 30; i++)
             {
                 prevRoad = (roads.Where(x => x.Item1.Equals(prevRoad.Item2)).OrderBy(x => Vector2.Distance(x.Item2, destinationBuilding)).First());
                 fakeBestPath.Add(prevRoad);
+                Console.WriteLine(allroads[i]);
             }
-            Console.WriteLine(fakeBestPath);
+
+            Dijkstra(graph, 0, 9);
+            Console.WriteLine(startingBuilding);
+            Console.WriteLine(StartX);
+            Console.WriteLine(destinationBuilding);
+            Console.WriteLine(allroads[2].Item1);
+            Console.WriteLine(prevRoad);
+
             return fakeBestPath;
         }
+
+        private static int Minimumdistance(int[] distance, bool[] shortest, int count)
+        {
+            int inf = int.MaxValue;
+            int minIndex = 0;
+
+            for (int v = 0; v<count; v++)
+            {
+                if (shortest[v] == false && distance[v] <= inf)
+                {
+                    inf = distance[v];
+                    minIndex = v;
+                }
+            }
+            return minIndex;
+        }
+
+        private static void Print(int[] distance, int count)
+        {
+            Console.WriteLine("Vertex      distance from start");
+
+            for ( int i = 0; i<count; i++)
+            {
+                Console.WriteLine("{0}\t  {1}", i, distance[i]);
+            }
+        }
+
+
+        //public static void Dijkstra(Vector2 A, int B, List<Tuple<Vector2, Vector2>> Road)
+        //{
+        //    int n = Road.Count();
+        //    Vector2[] distance = new Vector2[n];
+        //    bool[] visited = new bool[n];
+        //    //int x = Convert.ToInt32(A.X);
+
+        //    for (int i = 0; i < n; i++)
+        //    {
+        //        distance[i] = int.MaxValue;
+        //        visited[i] = false;
+        //    }
+        //    distance[A] = 0;
+
+        //    for (int i = 0; i < n; i++)
+        //    {
+        //        int cur = -1;
+        //        for (int j = 0; j < n; j++)
+        //        {
+        //            if (visited[j]) continue;
+        //            if (cur == -1 || distance[j] < distance[cur])
+        //            {
+        //                cur = j;
+        //            }
+        //        }
+
+        //        visited[cur] = true;
+        //        for (int j = 0; j < n; j++)
+        //        {
+        //            int path = distance[cur] + A;
+        //            if (path < distance[j])
+        //            {
+        //                distance[j] = path;
+        //            }
+        //        }
+        //    }
+        //    Print(distance, n);
+        //}
+
+        public static void Dijkstra(int[,] graph, int source, int count)
+        {
+            int[] distance = new int[count];
+            bool[] shortest = new bool[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                distance[i] = int.MaxValue;
+                shortest[i] = false;
+            }
+
+            distance[source] = 0;
+
+            for (int sum = 0; sum < count - 1; sum++)
+            {
+                int u = Minimumdistance(distance, shortest, count);
+                shortest[u] = true;
+
+                for (int v = 0; v < count; v++)
+                    if (!shortest[v] && Convert.ToBoolean(graph[u, v]) && distance[u] != int.MaxValue && distance[u] + graph[u, v] < distance[v])
+                        distance[v] = distance[u] + graph[u, v];
+            }
+            Print(distance, count);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         private static IEnumerable<IEnumerable<Tuple<Vector2, Vector2>>> FindRoutesToAll(Vector2 startingBuilding,
           IEnumerable<Vector2> destinationBuildings, IEnumerable<Tuple<Vector2, Vector2>> roads)
@@ -299,4 +475,5 @@ namespace EntryPoint
     internal class T
     {
     }
+    
 }

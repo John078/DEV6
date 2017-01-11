@@ -29,44 +29,7 @@ namespace EntryPoint
         }
 
 
-        //j huidige value, en k de nieuwe in te vullen value.
-        public KDTree<Vector2> Insert(KDTree<Vector2> j, Vector2 k)
-        {
-            if (j.IsEmpty)
-            {
-                return new Node<Vector2>(new Empty<Vector2>(), new Empty<Vector2>(), k, true);
-            }
-
-            //if not empty
-            else
-            {
-                if (IsVertical)
-                {
-                    //als de nieuwe value kleiner is dan j gaat hij naar links. Vertical wordt false.
-                    if (j.Value.X > k.X)
-                    {
-                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, false);
-                    }
-                    else
-                    {
-                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, false);
-                    }
-                }
-                else
-                {
-                    //als de nieuwe value kleinder is dan j gaat hij naar links. Vertical wordt true.
-                    if (j.Value.Y > k.Y)
-                    {
-                        return new Node<Vector2>(Insert(j.Left, k), j.Right, j.Value, true);
-                    }
-                    else
-                    {
-                        return new Node<Vector2>(j.Left, Insert(j.Right, k), j.Value, true);
-                    }
-                }
-                
-            }
-        }
+       
        
     }
 }
