@@ -265,31 +265,22 @@ namespace EntryPoint
 
 
 
-        //----------------------------------   Assignment 3 ---------------------------------//
-
+        //----------------------------------   Assignment 3   ---------------------------------//
+       // NOT WORKING CODE ...
+       
 
 
 
         private static IEnumerable<Tuple<Vector2, Vector2>> FindRoute(Vector2 startingBuilding,
           Vector2 destinationBuilding, IEnumerable<Tuple<Vector2, Vector2>> roads)
         {
-            int[,] graph = {
-    { 0, 4, 0, 0, 0, 0, 0, 8, 0 },
-    { 4, 0, 8, 0, 0, 0, 0, 11, 0 },
-    { 0, 8, 0, 7, 0, 4, 0, 0, 2 },
-    { 0, 0, 7, 0, 9, 14, 0, 0, 0 },
-    { 0, 0, 0, 9, 0, 10, 0, 0, 0 },
-    { 0, 0, 4, 0, 10, 0, 2, 0, 0 },
-    { 0, 0, 0, 14, 0, 2, 0, 1, 6 },
-    { 8, 11, 0, 0, 0, 0, 1, 0, 7 },
-    { 0, 0, 2, 0, 0, 0, 6, 7, 0 }
-};
+
 
             var startingRoad = roads.Where(x => x.Item1.Equals(startingBuilding)).First();
             List<Tuple<Vector2, Vector2>> fakeBestPath = new List<Tuple<Vector2, Vector2>>() { startingRoad };
-            List<Tuple<Vector2, Vector2>> allroads = roads.ToList(); 
+            List<Tuple<Vector2, Vector2>> allroads = roads.ToList();
             List<Tuple<Vector2, Vector2>> neeew = allroads;
-           
+
             var prevRoad = startingRoad;
 
             var StartX = startingBuilding.X;
@@ -298,15 +289,14 @@ namespace EntryPoint
             //int beginX = int(BeginStartRoad.X);
             //int beginY = BeginStartRoad.Y;
 
-            
+
             for (int i = 0; i < 30; i++)
             {
                 prevRoad = (roads.Where(x => x.Item1.Equals(prevRoad.Item2)).OrderBy(x => Vector2.Distance(x.Item2, destinationBuilding)).First());
                 fakeBestPath.Add(prevRoad);
                 Console.WriteLine(allroads[i]);
             }
-
-            Dijkstra(graph, 0, 9);
+            
             Console.WriteLine(startingBuilding);
             Console.WriteLine(StartX);
             Console.WriteLine(destinationBuilding);
@@ -321,7 +311,7 @@ namespace EntryPoint
             int inf = int.MaxValue;
             int minIndex = 0;
 
-            for (int v = 0; v<count; v++)
+            for (int v = 0; v < count; v++)
             {
                 if (shortest[v] == false && distance[v] <= inf)
                 {
@@ -336,84 +326,37 @@ namespace EntryPoint
         {
             Console.WriteLine("Vertex      distance from start");
 
-            for ( int i = 0; i<count; i++)
+            for (int i = 0; i < count; i++)
             {
                 Console.WriteLine("{0}\t  {1}", i, distance[i]);
             }
         }
 
 
-        //public static void Dijkstra(Vector2 A, int B, List<Tuple<Vector2, Vector2>> Road)
+        //public static void Dijkstra(int[,] graph, int source, int count)
         //{
-        //    int n = Road.Count();
-        //    Vector2[] distance = new Vector2[n];
-        //    bool[] visited = new bool[n];
-        //    //int x = Convert.ToInt32(A.X);
+        //    int[] distance = new int[count];
+        //    bool[] shortest = new bool[count];
 
-        //    for (int i = 0; i < n; i++)
+        //    for (int i = 0; i < count; i++)
         //    {
         //        distance[i] = int.MaxValue;
-        //        visited[i] = false;
+        //        shortest[i] = false;
         //    }
-        //    distance[A] = 0;
 
-        //    for (int i = 0; i < n; i++)
+        //    distance[source] = 0;
+
+        //    for (int sum = 0; sum < count - 1; sum++)
         //    {
-        //        int cur = -1;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            if (visited[j]) continue;
-        //            if (cur == -1 || distance[j] < distance[cur])
-        //            {
-        //                cur = j;
-        //            }
-        //        }
+        //        int u = Minimumdistance(distance, shortest, count);
+        //        shortest[u] = true;
 
-        //        visited[cur] = true;
-        //        for (int j = 0; j < n; j++)
-        //        {
-        //            int path = distance[cur] + A;
-        //            if (path < distance[j])
-        //            {
-        //                distance[j] = path;
-        //            }
-        //        }
+        //        for (int v = 0; v < count; v++)
+        //            if (!shortest[v] && Convert.ToBoolean(graph[u, v]) && distance[u] != int.MaxValue && distance[u] + graph[u, v] < distance[v])
+        //                distance[v] = distance[u] + graph[u, v];
         //    }
-        //    Print(distance, n);
+        //    Print(distance, count);
         //}
-
-        public static void Dijkstra(int[,] graph, int source, int count)
-        {
-            int[] distance = new int[count];
-            bool[] shortest = new bool[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                distance[i] = int.MaxValue;
-                shortest[i] = false;
-            }
-
-            distance[source] = 0;
-
-            for (int sum = 0; sum < count - 1; sum++)
-            {
-                int u = Minimumdistance(distance, shortest, count);
-                shortest[u] = true;
-
-                for (int v = 0; v < count; v++)
-                    if (!shortest[v] && Convert.ToBoolean(graph[u, v]) && distance[u] != int.MaxValue && distance[u] + graph[u, v] < distance[v])
-                        distance[v] = distance[u] + graph[u, v];
-            }
-            Print(distance, count);
-        }
-
-
-
-
-
-
-
-
 
 
 
